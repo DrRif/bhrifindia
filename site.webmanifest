@@ -1,0 +1,12 @@
+{
+  "name": "Bridge Health Research Foundation",
+  "short_name": "BHRF",
+  "icons": [
+    { "src": "/assets/img/favicon.svg", "type": "image/svg+xml", "sizes": "any" },
+    { "src": "/assets/img/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ],
+  "theme_color": "#1B232D",
+  "background_color": "#1B232D",
+  "display": "standalone",
+  "start_url": "/"
+}

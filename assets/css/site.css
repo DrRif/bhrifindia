@@ -1,0 +1,634 @@
+/* ==========================================================================
+   Bridge Health Research Foundation — site.css
+
+   1. Tokens          primitives, then semantic aliases
+   2. Base            reset and elements
+   3. Layout          wrap, surface, section-head
+   4. Utilities       u- prefixed, single-purpose
+   5. Components      one block each, BEM-ish naming
+
+   Rule that governs the whole palette: amber is only ever used for
+   CONNECTIVE elements — cables, rails, node markers, rules, focus.
+   Never as a background wash or decorative fill.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. TOKENS
+   ========================================================================== */
+
+:root {
+  /* --- colour primitives ------------------------------------------------
+     Slate ramp. --slate-500 and --slate-900 are the two brand endpoints;
+     everything else is derived, to give the bridge drawing depth. */
+  --slate-950: #131A22;
+  --slate-900: #1B232D;   /* brand: structure, dark end */
+  --slate-800: #222C38;
+  --slate-700: #2A3543;
+  --slate-600: #34414F;
+  --slate-500: #48586C;   /* brand: structure, light end */
+  --slate-400: #5A6B80;
+  --slate-300: #8494A6;
+  --slate-200: #C3CCD6;
+
+  /* Amber ramp. --amber-400 and --amber-600 are the brand endpoints. */
+  --amber-300: #FFD070;
+  --amber-400: #F0BB4D;   /* brand: cable, light end */
+  --amber-600: #C2871C;   /* brand: cable, dark end */
+
+  /* Cream ramp. --cream-50 and --cream-100 are the brand endpoints. */
+  --cream-50:  #FBF8F2;   /* brand: paper */
+  --cream-100: #EFE9DC;   /* brand: tinted paper */
+  --cream-200: #DFD7C6;
+
+  --ink:       #1B232D;
+  --ink-muted: #4E5C6C;
+
+  /* Error is the one hue outside the brand. Desaturated so it reads as a
+     correction, not an alarm. */
+  --red-300: #E08A72;
+  --red-600: #A03A22;
+
+  /* --- semantic colour --------------------------------------------------
+     Components reference these, never the primitives above. */
+  --bg:               var(--slate-900);
+  --bg-deep:          var(--slate-950);
+  --bg-paper:         var(--cream-50);
+  --bg-tint:          var(--cream-100);
+  --bg-input:         rgba(255, 255, 255, 0.04);
+
+  --text:             var(--cream-100);
+  --text-strong:      var(--cream-50);
+  --text-muted:       var(--slate-300);
+  --text-paper:       var(--ink);
+  --text-paper-muted: var(--ink-muted);
+
+  --accent:           var(--amber-400);
+  --accent-hover:     var(--amber-300);
+  --accent-strong:    var(--amber-600);
+
+  --line-dark:        rgba(239, 233, 220, 0.16);  /* hairline on slate */
+  --line-dark-solid:  rgba(239, 233, 220, 0.28);  /* control borders on slate */
+  --line-paper:       rgba(27, 35, 45, 0.14);     /* hairline on cream */
+  --line-paper-solid: rgba(27, 35, 45, 0.28);     /* control borders on cream */
+
+  --focus:            var(--amber-400);
+  --focus-ring:       rgba(240, 187, 77, 0.25);
+  --danger:           var(--red-300);
+  --danger-ring:      rgba(224, 138, 114, 0.25);
+
+  /* --- typography ------------------------------------------------------- */
+  --font-serif: "Spectral", Georgia, "Times New Roman", serif;
+  --font-sans:  "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semi:    600;
+
+  --leading-tight: 1.14;   /* display headings */
+  --leading-snug:  1.28;   /* sub-headings */
+  --leading-mid:   1.5;    /* serif lede */
+  --leading-body:  1.62;   /* sans body */
+
+  --text-label: 0.72rem;   /* uppercase labels */
+  --text-micro: 0.82rem;   /* legal, notes */
+  --text-small: 0.9rem;    /* UI, captions */
+
+  --step--1: clamp(0.82rem, 0.80rem + 0.10vw, 0.88rem);
+  --step-0:  clamp(1.00rem, 0.97rem + 0.16vw, 1.09rem);
+  --step-1:  clamp(1.20rem, 1.13rem + 0.34vw, 1.42rem);
+  --step-2:  clamp(1.44rem, 1.31rem + 0.64vw, 1.85rem);
+  --step-3:  clamp(1.73rem, 1.50rem + 1.12vw, 2.40rem);
+  --step-4:  clamp(2.07rem, 1.68rem + 1.92vw, 3.13rem);
+  --step-5:  clamp(2.49rem, 1.83rem + 3.20vw, 4.07rem);
+
+  --tracking-label: 0.14em;
+  --tracking-caps:  0.19em;
+
+  /* --- space (0.25rem base grid) ---------------------------------------- */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-7:  2rem;
+  --space-8:  2.5rem;
+  --space-9:  3rem;
+  --space-10: 4rem;
+  --space-11: 5rem;
+
+  --space-section: clamp(3.5rem, 8vw, 7rem);   /* between sections */
+  --space-block:   clamp(2rem, 4vw, 3.25rem);  /* heading block to content */
+  --space-item:    clamp(1.5rem, 3vw, 2.4rem); /* rail item padding */
+  --gutter:        clamp(1.25rem, 5vw, 4rem);
+
+  /* --- border and radius ------------------------------------------------ */
+  --radius-sm:     2px;   /* every rectangular control */
+  --radius-pill:   999px;
+  --radius-circle: 50%;
+  --border-hair:   1px;
+  --border-mark:   2px;   /* node rings, active underlines */
+  --border-anchor: 4px;   /* callout left edge */
+
+  /* --- motion ----------------------------------------------------------- */
+  --dur-fast: 0.18s;
+  --dur-mid:  0.55s;
+  --dur-slow: 1.5s;
+  --ease-out:  ease-out;
+  --ease-draw: cubic-bezier(0.65, 0.02, 0.3, 1);
+
+  /* --- layout ----------------------------------------------------------- */
+  --measure:      68ch;   /* sans body */
+  --measure-lede: 58ch;   /* serif lede runs wider per character */
+  --width-page:   1180px;
+  --width-narrow: 760px;
+  --width-form:   34rem;
+}
+
+/* ==========================================================================
+   2. BASE
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: var(--leading-body);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.012em;
+  margin: 0 0 0.6em;
+  text-wrap: balance;
+}
+h1 { font-size: var(--step-5); }
+h2 { font-size: var(--step-3); }
+h3 { font-size: var(--step-1); line-height: var(--leading-snug); }
+p  { margin: 0 0 1.1em; max-width: var(--measure); }
+a  { color: inherit; }
+strong { font-weight: var(--weight-semi); }
+
+::selection { background: var(--accent); color: var(--slate-950); }
+
+:focus-visible {
+  outline: var(--border-mark) solid var(--focus);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.skip {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: var(--accent); color: var(--slate-950);
+  padding: var(--space-3) var(--space-5);
+  font-weight: var(--weight-semi);
+}
+.skip:focus { left: 0; }
+
+/* ==========================================================================
+   3. LAYOUT
+   ========================================================================== */
+
+.wrap { width: min(var(--width-page), 100% - (var(--gutter) * 2)); margin-inline: auto; }
+.wrap--narrow { width: min(var(--width-narrow), 100% - (var(--gutter) * 2)); }
+
+section { padding-block: var(--space-section); }
+
+/* Surfaces set their own text colour. Adding a new surface never requires
+   editing a :not() chain elsewhere — the fragile approach this replaces. */
+.surface--paper { background: var(--bg-paper); color: var(--text-paper); }
+.surface--tint  { background: var(--bg-tint);  color: var(--text-paper); }
+.surface--deep  { background: var(--bg-deep);  color: var(--text); }
+
+.surface--paper h1, .surface--paper h2, .surface--paper h3,
+.surface--tint  h1, .surface--tint  h2, .surface--tint  h3 { color: var(--slate-900); }
+
+.section-head { max-width: 62ch; margin-bottom: var(--space-block); }
+.section-head p { color: var(--text-muted); }
+.surface--paper .section-head p,
+.surface--tint  .section-head p { color: var(--text-paper-muted); }
+
+.page-title { max-width: 22ch; }
+
+.lede {
+  font-family: var(--font-serif);
+  font-size: var(--step-1);
+  line-height: var(--leading-mid);
+  color: var(--text);
+  max-width: var(--measure-lede);
+}
+.surface--paper .lede, .surface--tint .lede { color: var(--text-paper-muted); }
+
+.note { font-size: var(--text-small); color: var(--text-muted); max-width: 62ch; }
+.surface--paper .note, .surface--tint .note { color: var(--text-paper-muted); }
+
+/* ==========================================================================
+   4. UTILITIES
+   ========================================================================== */
+
+.u-flush-bottom { padding-bottom: 0; }
+.u-measure      { max-width: var(--measure); }
+.u-mb-0         { margin-bottom: 0; }
+.u-mt-4         { margin-top: var(--space-4); }
+.u-mt-7         { margin-top: var(--space-7); }
+.u-mt-8         { margin-top: var(--space-8); }
+.u-mt-9         { margin-top: var(--space-9); }
+.muted          { color: var(--text-muted); }
+.surface--paper .muted, .surface--tint .muted { color: var(--text-paper-muted); }
+
+/* ==========================================================================
+   5. COMPONENTS
+   ========================================================================== */
+
+/* --- masthead ---------------------------------------------------------- */
+
+.masthead {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(19, 26, 34, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: var(--border-hair) solid var(--line-dark);
+}
+.masthead__inner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-6); padding-block: 0.85rem;
+}
+
+/* --- lockup ------------------------------------------------------------ */
+
+.lockup { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; }
+.lockup img { width: 56px; height: auto; display: block; flex: none; }
+.lockup__name {
+  font-family: var(--font-serif);
+  font-size: 1.16rem; line-height: 1.05; letter-spacing: -0.01em;
+  color: var(--text-strong);
+}
+.lockup__name b { font-weight: var(--weight-regular); color: var(--accent); }
+.lockup__sub {
+  display: block; font-family: var(--font-sans);
+  font-size: 0.6rem; letter-spacing: var(--tracking-caps); text-transform: uppercase;
+  color: var(--text-muted); margin-top: var(--space-1); font-weight: var(--weight-medium);
+}
+
+/* --- nav --------------------------------------------------------------- */
+
+.nav { display: flex; align-items: center; gap: clamp(1rem, 2.2vw, 2rem); }
+.nav a {
+  text-decoration: none; font-size: 0.94rem; color: var(--slate-200);
+  padding-block: var(--space-1);
+  border-bottom: var(--border-mark) solid transparent;
+}
+.nav a:hover { color: var(--text-strong); border-bottom-color: var(--accent); }
+.nav a[aria-current="page"] { color: var(--text-strong); border-bottom-color: var(--accent); }
+
+.nav__toggle {
+  display: none;
+  background: none; color: var(--text-strong);
+  border: var(--border-hair) solid var(--line-dark-solid);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  font: inherit; font-size: 0.88rem; cursor: pointer;
+}
+.nav__toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+@media (max-width: 860px) {
+  .nav__toggle { display: block; }
+  .nav {
+    display: none; position: absolute; inset: 100% 0 auto 0;
+    background: var(--bg-deep);
+    border-bottom: var(--border-hair) solid var(--line-dark);
+    flex-direction: column; align-items: stretch; gap: 0;
+    padding: var(--space-2) var(--gutter) var(--space-5);
+  }
+  .nav[data-open="true"] { display: flex; }
+  .nav a { padding-block: var(--space-3); border-bottom: var(--border-hair) solid var(--line-dark); }
+  .lockup__sub { display: none; }
+}
+
+/* --- hero -------------------------------------------------------------- */
+
+.hero {
+  position: relative; overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 0%,
+              var(--slate-700) 0%, var(--bg) 48%, var(--bg-deep) 100%);
+  padding-block: clamp(3.5rem, 9vw, 6.5rem) 0;
+}
+.hero__text { position: relative; z-index: 2; text-align: center; }
+.hero h1 { color: var(--text-strong); max-width: 26ch; margin-inline: auto; }
+.hero__lede {
+  margin: var(--space-6) auto 0; max-width: 54ch;
+  color: var(--slate-200); font-size: var(--step-1);
+  font-family: var(--font-serif); line-height: var(--leading-mid);
+}
+.hero__status {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  margin-bottom: var(--space-6); padding: var(--space-1) var(--space-4);
+  border: var(--border-hair) solid rgba(240, 187, 77, 0.4);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-micro); letter-spacing: 0.04em; color: var(--accent);
+}
+.hero__status::before {
+  content: ""; width: 6px; height: 6px; border-radius: var(--radius-circle);
+  background: var(--accent); flex: none;
+}
+.hero__actions {
+  display: flex; flex-wrap: wrap; gap: var(--space-3);
+  justify-content: center; margin-top: var(--space-7);
+}
+
+/* --- bridge (the hero drawing) -----------------------------------------
+   Colours live here, not as hex in the SVG's presentation attributes, so
+   the drawing recolours with the palette like any other component. */
+
+.bridge { display: block; width: 100%; margin-top: clamp(1rem, 3vw, 2rem); }
+.bridge svg { display: block; width: 100%; height: auto; }
+
+.bridge__horizon   { stroke: var(--cream-100); stroke-opacity: 0.08; stroke-width: 1; }
+.bridge__pier      { fill: var(--slate-800); }
+.bridge__deck      { fill: url(#deckGrad); }
+.bridge__deck-edge { stroke: var(--slate-400); stroke-opacity: 0.5; }
+.bridge__cap       { fill: var(--slate-400); }
+.bridge__cable     { fill: none; stroke: url(#cableGrad); stroke-width: 3.5; stroke-linecap: round; }
+.bridge__hanger    { stroke: var(--accent); stroke-opacity: 0.55; stroke-width: 1.4; }
+.bridge__badge     { fill: var(--cream-100); }
+.bridge__ring      { fill: none; stroke: var(--accent-strong); stroke-width: 1.5; }
+.bridge__ring--lg  { stroke-width: 1.8; }
+.bridge__glyph     { fill: none; stroke: var(--slate-900); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.bridge__glyph--lg { stroke-width: 2; }
+.bridge__dot       { fill: var(--slate-900); stroke: none; }
+
+.deck-stop-1  { stop-color: var(--slate-500); }
+.deck-stop-2  { stop-color: var(--slate-600); }
+.cable-stop-1 { stop-color: var(--amber-600); }
+.cable-stop-2 { stop-color: var(--amber-400); }
+.cable-stop-3 { stop-color: var(--amber-600); }
+
+/* One orchestrated load moment: the cable draws, then the pods settle.
+   Animate opacity only — a CSS transform would override the transform
+   attribute that positions each SVG group. */
+.bridge__cable { stroke-dasharray: 100; stroke-dashoffset: 100; animation: draw var(--dur-slow) var(--ease-draw) 0.25s forwards; }
+.pod    { opacity: 0; animation: settle var(--dur-mid) var(--ease-out) forwards; }
+.pod--1 { animation-delay: 1.25s; }
+.pod--2 { animation-delay: 1.4s; }
+.pod--3 { animation-delay: 1.55s; }
+.anchor { opacity: 0; animation: settle 0.6s var(--ease-out) 1.7s forwards; }
+
+@keyframes draw   { to { stroke-dashoffset: 0; } }
+@keyframes settle { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .bridge__cable { animation: none; stroke-dashoffset: 0; }
+  .pod, .anchor  { animation: none; opacity: 1; }
+}
+
+/* --- button ------------------------------------------------------------ */
+
+.btn {
+  display: inline-block; text-decoration: none;
+  font: inherit; font-weight: var(--weight-semi); font-size: 0.95rem;
+  padding: 0.78rem var(--space-6);
+  border: var(--border-hair) solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) ease,
+              color var(--dur-fast) ease,
+              border-color var(--dur-fast) ease;
+}
+.btn--primary { background: var(--accent); color: var(--slate-950); }
+.btn--primary:hover  { background: var(--accent-hover); }
+.btn--primary:active { background: var(--accent-strong); }
+
+.btn--ghost { border-color: var(--line-dark-solid); color: var(--text-strong); }
+.btn--ghost:hover  { border-color: var(--accent); color: var(--accent); }
+.btn--ghost:active { border-color: var(--accent-strong); color: var(--accent-strong); }
+.surface--paper .btn--ghost, .surface--tint .btn--ghost { border-color: var(--line-paper-solid); color: var(--slate-900); }
+.surface--paper .btn--ghost:hover, .surface--tint .btn--ghost:hover { border-color: var(--accent-strong); color: var(--accent-strong); }
+
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+
+/* --- label (one component; was .tag and .callout__flag) ---------------- */
+
+.label {
+  display: block;
+  font-size: var(--text-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  font-weight: var(--weight-semi);
+  color: var(--accent);
+  margin-bottom: var(--space-2);
+}
+.surface--paper .label, .surface--tint .label { color: var(--accent-strong); }
+.label--outline {
+  display: inline-block;
+  border: var(--border-hair) solid currentColor;
+  border-radius: var(--radius-pill);
+  padding: 0.15rem 0.55rem;
+  margin-bottom: var(--space-4);
+}
+
+/* --- rail (programme items hanging off one cable) ---------------------- */
+
+.rail { position: relative; padding-left: clamp(2rem, 5vw, 3.5rem); }
+.rail::before {
+  content: ""; position: absolute; left: 6px; top: 10px; bottom: 10px; width: 2px;
+  background: linear-gradient(180deg, var(--amber-400) 0%, var(--amber-600) 100%);
+  opacity: 0.55;
+}
+.rail__item {
+  position: relative;
+  padding-block: var(--space-item);
+  border-top: var(--border-hair) solid var(--line-paper);
+}
+.rail__item:first-child { border-top: 0; padding-top: 0; }
+.rail__item::before {
+  content: ""; position: absolute;
+  left: calc(-1 * clamp(2rem, 5vw, 3.5rem) + 1px);
+  top: clamp(1.9rem, 3.4vw, 2.9rem);
+  width: 12px; height: 12px; border-radius: var(--radius-circle);
+  background: var(--bg-paper); border: 2.5px solid var(--accent-strong);
+}
+.rail__item:first-child::before { top: 0.4rem; }
+.rail__item h3 { margin-bottom: var(--space-1); }
+.rail__item ul { margin: var(--space-3) 0 0; padding-left: var(--space-5); color: var(--text-paper-muted); }
+.rail__item li { margin-bottom: 0.45rem; max-width: var(--measure); }
+
+/* --- piers (the three-part case) --------------------------------------- */
+
+.piers {
+  display: grid; gap: clamp(1.5rem, 4vw, 3rem);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.pier h3 { margin-bottom: var(--space-1); }
+.pier p  { font-size: 0.98rem; color: var(--text-muted); }
+.surface--paper .pier p, .surface--tint .pier p { color: var(--text-paper-muted); }
+.pier__num {
+  display: block;
+  font-family: var(--font-serif); font-size: 0.95rem; color: var(--accent);
+  padding-bottom: var(--space-3); margin-bottom: var(--space-3);
+  border-bottom: var(--border-mark) solid var(--accent);
+}
+.surface--paper .pier__num, .surface--tint .pier__num { color: var(--accent-strong); }
+
+/* --- goals ------------------------------------------------------------- */
+
+.goals {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  column-gap: clamp(2rem, 5vw, 4rem);
+}
+.goals li {
+  position: relative;
+  padding: 1.05rem 0 1.05rem var(--space-7);
+  border-bottom: var(--border-hair) solid var(--line-dark);
+  max-width: 46ch;
+}
+.goals li::before {
+  content: ""; position: absolute; left: 0; top: 1.65rem;
+  width: 10px; height: 2px; background: var(--accent);
+}
+
+/* --- callout ----------------------------------------------------------- */
+
+.callout {
+  background: var(--bg-paper);
+  border: var(--border-hair) solid rgba(27, 35, 45, 0.16);
+  border-left: var(--border-anchor) solid var(--accent);
+  padding: clamp(1.4rem, 3.5vw, 2.4rem);
+}
+.callout h3 { margin-bottom: var(--space-2); }
+.callout p:last-child { margin-bottom: 0; }
+.callout__action { margin-top: var(--space-2); }
+
+/* --- prose (long statutory and explanatory text) ----------------------- */
+
+.prose { max-width: var(--measure); }
+.prose h2 { margin-top: var(--space-8); }
+.prose h3 { margin-top: var(--space-7); }
+.prose ol, .prose ul { padding-left: var(--space-5); }
+.prose li { margin-bottom: var(--space-3); }
+.prose blockquote {
+  margin: var(--space-7) 0;
+  padding-left: var(--space-6);
+  border-left: var(--border-mark) solid var(--accent);
+  font-family: var(--font-serif); font-size: var(--step-1); line-height: var(--leading-mid);
+  color: var(--slate-700);
+}
+
+/* --- objects (numbered statutory clauses) ------------------------------ */
+
+.objects { counter-reset: obj; list-style: none; padding: 0; margin: 0; }
+.objects li {
+  counter-increment: obj; position: relative;
+  padding: var(--space-5) 0 var(--space-5) var(--space-9);
+  border-top: var(--border-hair) solid var(--line-paper);
+  max-width: var(--measure);
+}
+.objects li::before {
+  content: "(" counter(obj) ")";
+  position: absolute; left: 0; top: var(--space-5);
+  font-family: var(--font-serif); font-size: 0.95rem; color: var(--accent-strong);
+}
+
+/* --- spec (definition rows; was .rows) --------------------------------- */
+
+.spec { border-top: var(--border-hair) solid var(--line-dark); margin-top: var(--space-7); }
+.surface--paper .spec, .surface--tint .spec { border-top-color: var(--line-paper); }
+.spec > div {
+  display: grid; grid-template-columns: minmax(150px, 22%) 1fr;
+  gap: var(--space-6); padding: var(--space-4) 0;
+  border-bottom: var(--border-hair) solid var(--line-dark);
+}
+.surface--paper .spec > div, .surface--tint .spec > div { border-bottom-color: var(--line-paper); }
+.spec dt { font-weight: var(--weight-semi); font-size: var(--text-small); color: var(--text-muted); }
+.surface--paper .spec dt, .surface--tint .spec dt { color: var(--text-paper-muted); }
+.spec dd { margin: 0; }
+@media (max-width: 620px) { .spec > div { grid-template-columns: 1fr; gap: var(--space-1); } }
+
+/* --- cta --------------------------------------------------------------- */
+
+.cta__grid {
+  display: grid; gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: start;
+}
+.cta h2 { color: var(--text-strong); }
+
+/* --- contact list ------------------------------------------------------ */
+
+.contact-list { list-style: none; margin: 0; padding: 0; }
+.contact-list li { padding: 0.85rem 0; border-bottom: var(--border-hair) solid var(--line-dark); }
+.contact-list a {
+  color: var(--accent); text-decoration: none;
+  border-bottom: var(--border-hair) solid rgba(240, 187, 77, 0.35);
+}
+.contact-list a:hover { border-bottom-color: var(--accent); }
+.contact-list span {
+  display: block; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: var(--space-1);
+}
+
+/* --- form -------------------------------------------------------------- */
+
+.form { display: grid; gap: 1.1rem; max-width: var(--width-form); }
+.form label { display: grid; gap: var(--space-1); font-size: 0.88rem; font-weight: var(--weight-semi); color: var(--text); }
+.form input, .form textarea, .form select {
+  font: inherit; font-size: 0.95rem;
+  padding: var(--space-3) 0.85rem;
+  border: var(--border-hair) solid var(--line-dark-solid);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input); color: var(--text-strong);
+}
+.form textarea { min-height: 8rem; resize: vertical; }
+.form input:focus, .form textarea:focus, .form select:focus {
+  border-color: var(--accent); outline: none;
+  box-shadow: 0 0 0 var(--border-mark) var(--focus-ring);
+}
+.form input:user-invalid, .form textarea:user-invalid { border-color: var(--danger); }
+.form input:user-invalid:focus, .form textarea:user-invalid:focus {
+  box-shadow: 0 0 0 var(--border-mark) var(--danger-ring);
+}
+.form input:disabled, .form textarea:disabled, .form select:disabled { opacity: 0.5; cursor: not-allowed; }
+.form .btn { justify-self: start; }
+.form__req  { color: var(--accent); font-weight: var(--weight-regular); }
+.form__note { font-size: 0.84rem; color: var(--text-muted); max-width: var(--width-form); }
+.form__note a { color: var(--accent); }
+
+/* --- footer ------------------------------------------------------------ */
+
+.site-footer {
+  background: var(--bg-deep);
+  border-top: var(--border-hair) solid var(--line-dark);
+  padding-block: var(--space-9) var(--space-8);
+  font-size: var(--text-small); color: var(--text-muted);
+}
+.site-footer__grid {
+  display: grid; gap: var(--space-7);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin-bottom: var(--space-8);
+}
+.site-footer h4 {
+  font-family: var(--font-sans); font-size: 0.74rem;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text); margin-bottom: var(--space-3); font-weight: var(--weight-semi);
+}
+.site-footer ul { list-style: none; margin: 0; padding: 0; }
+.site-footer li { margin-bottom: var(--space-2); }
+.site-footer a { text-decoration: none; color: var(--slate-200); }
+.site-footer a:hover { color: var(--accent); }
+.site-footer__legal {
+  border-top: var(--border-hair) solid var(--line-dark);
+  padding-top: var(--space-6);
+  display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-7);
+  justify-content: space-between;
+}
+.site-footer__legal p { margin: 0; max-width: 60ch; font-size: var(--text-micro); }
